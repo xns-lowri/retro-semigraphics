@@ -39,14 +39,14 @@
 
 #include "../cpph/rsg-datatypes.h"
 #include "../cpph/rsg-sdl-engine.h"
-#include "../cpph/rsg-graphics.h"
+#include "../cpph/rsg-gui-engine.h"
 
 /* Static variables */
 //list of verts
 const rsd::uint2 display_size = { 100, 32 };
 
-static RsgEngine* main_window;
-static RsgGuiEngine* gui;
+RsgEngine* rsg_engine;
+RsgGuiEngine* rsg_gui;
 
 //static Uint32 n_chars = 0;  //total number of glyphs on screen
 //rsd::CharData* debug;
@@ -54,12 +54,14 @@ static RsgGuiEngine* gui;
 /* This function is called once by SDL when program is started */
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 {
-    main_window = new RsgEngine();
+    rsg_engine = new RsgEngine();
+    rsg_gui = new RsgGuiEngine(rsg_engine);
 
     //Init SDL engine, handles window+GPU and streaming chardata
     SDL_AppResult rsg_result = 
-        main_window->Init(    
+        rsg_engine->Init(    
             display_size,   //create display with specified dims (chars, not px)
+            2,              //scale of 2 because i can't see too good
             false,          //don't allow resizing
             "gtest32.bmp"   //using 32 glyphs per row test font
         );
@@ -67,19 +69,9 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
         return rsg_result;  //quit early on error
     }
 
-    //debug draw one line of p1nk
-    /*rseng::FillCharacter(
-        0,
-        display_size.x,
-        new (rsd::CharData)
-        {
-            1.0f,1.0f,1.0f,1.0f,
-            1.0f,0.5f,1.0,1.0f,
-            ' '
-        }
-    );*/
 
-    gui->drawWindow(
+    //debug draw window
+    rsg_gui->drawWindow(
         rsd::uint2(0, 0),
         rsd::uint2(display_size.x, display_size.y), //display_size,
         rsd::float4(0.8f,0.8f,0.8f,1.0f),
@@ -98,7 +90,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
         }
     );*/
 
-    SDL_Log("\\0: %u, \\n: %u, \\r: %u, \\t: %u", '\0', '\n', '\r', '\t');
+    //SDL_Log("\\0: %u, \\n: %u, \\r: %u, \\t: %u", '\0', '\n', '\r', '\t');
 
     return SDL_APP_CONTINUE;
 }
@@ -108,13 +100,10 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 {
     //SDL_Log("Event: %i", event->type);
 
-    if (event->type == SDL_EVENT_QUIT) {
-        return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
-    }
-
-    //todo app handler
-    //todo update (repaint) graphics
-    return main_window->Event(event);
+    //todo app events handler
+    
+    //todo update (repaint) graphics - use callback
+    return rsg_engine->Event(event);
 }
 
 /* This function runs once per frame, and is the heart of the program. */
@@ -122,7 +111,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 {
     //update char buffer before render pass?
 
-    SDL_AppResult rsg_result = main_window->Render();
+    SDL_AppResult rsg_result = rsg_engine->Render();
     if (rsg_result != SDL_APP_CONTINUE) {
         return rsg_result;
     }
@@ -133,5 +122,5 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 /* This function runs once at shutdown. */
 void SDL_AppQuit(void* appstate, SDL_AppResult result)
 {
-    main_window->Quit();
+    rsg_engine->Quit();
 }

@@ -3,6 +3,7 @@
 #include <SDL3/SDL.h>
 #include "rsg-datatypes.h"
 
+class RsgGuiEngine;
 
 class RsgEngine {
     //static variables
@@ -42,12 +43,15 @@ class RsgEngine {
     SDL_GPUTransferBuffer* texTransferBuffer;
     SDL_GPUGraphicsPipeline* graphicsPipeline;
 
+    RsgGuiEngine* guiEngine;
+
 public:
     RsgEngine();
 
     /* SDL mirror functions */
     SDL_AppResult Init(
         rsd::uint2 display_size,
+        Uint32 rscale,
         bool allowResize,
         std::string defaultFont
     );
@@ -56,6 +60,16 @@ public:
     void Quit();
     /* End SDL functions */
 
+    bool SetGuiEngine(RsgGuiEngine* engine);
+
+    /* Getters and helpers */
+    //Get size of display in characters
+    rsd::uint2* GetDisplaySize();
+
+    //Get chardata array index from x,y point in display 
+    Uint32 PointToIndex(rsd::uint2 point);
+
+    /* Data setters */
     //character setters setters
     //set data for single char from input char data
     bool SetCharacter(Uint32 index, rsd::CharData* data);
@@ -66,10 +80,4 @@ public:
         Uint32 count,
         rsd::CharData* data
     );
-
-    //Get size of display in characters
-    rsd::uint2* GetDisplaySize();
-
-    //Get chardata array index from x,y point in display 
-    Uint32 PointToIndex(rsd::uint2 point);
 };

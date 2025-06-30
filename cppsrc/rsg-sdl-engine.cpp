@@ -5,6 +5,7 @@
 
 #include "../cpph/rsg-datatypes.h"
 #include "../cpph/rsg-sdl-engine.h"
+#include "../cpph/rsg-gui-engine.h"
 
 #define BG_COL 0.1f     //todo replace
 #define FG_COL 0.9f     //todo replace
@@ -29,30 +30,42 @@ struct UniformBuf {
 
 
 
-RsgEngine::RsgEngine() {
-    last_tick = 0; //use for framerate calc
-    scale = 2;                   //render scale
-    r_width = 0; r_height = 0;   //640x350?
-    w_width = 0; w_height = 0;   //1280x700?
+RsgEngine::RsgEngine() 
+{
+    scale = 2;  //default scale
 
-    n_chars = 0;  //total number of glyphs on screen
-
-    framerate = 0.f;
-}
-
-RsgEngine::RsgEngine(Uint32 rscale) {
-    last_tick = 0; //use for framerate calc
-    scale = rscale;              //render scale
+    //init class variables to _something_
+    last_tick = 0;
     r_width = 0; r_height = 0;
     w_width = 0; w_height = 0;
-
+    chars_per_line = 0; n_lines = 0;
     n_chars = 0;  //total number of glyphs on screen
-
     framerate = 0.f;
+
+    charData = NULL;
+    render_extents = { 0.f,0.f };
+    glyphsize = { 0.f,0.f };
+    glyphmapsize = { 0.f,0.f };
+
+    window = NULL; device = NULL;
+
+    charDataBuffer = NULL;
+    charDataPtr = NULL;
+
+    fontMapTexture = NULL;
+    fontMapSampler = NULL;
+    charTransferBuffer = NULL;
+    texTransferBuffer = NULL;
+    graphicsPipeline = NULL;
 }
 
 /* Call in SDL_AppInit to create window */
-SDL_AppResult RsgEngine::Init(rsd::uint2 display_size, bool allowResize, std::string defaultFont)
+SDL_AppResult RsgEngine::Init(
+    rsd::uint2 display_size, 
+    Uint32 rscale,
+    bool allowResize, 
+    std::string defaultFont
+)
 {
     //todo request screen size and scale?
     //system screen scaling?
@@ -537,14 +550,25 @@ SDL_AppResult RsgEngine::Render() {
 }
 
 SDL_AppResult RsgEngine::Event(SDL_Event* event) {
+    //return early if quit event
+    //todo may need to intercept for e.g. save changes alert
+    if (event->type == SDL_EVENT_QUIT) {
+        return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
+    }
+
+    SDL_AppResult appResult = SDL_APP_CONTINUE;
+    if (guiEngine != NULL) {
+        appResult = guiEngine->Event(event);
+    }
+
     //todo window resize
-    switch (event->type) {
+    /*switch (event->type) {
         case SDL_EVENT_WINDOW_RESIZED:
             SDL_Log("Window resized");
             break;
-    }
+    }*/
 
-    return SDL_APP_CONTINUE;
+    return appResult;
 }
 
 void RsgEngine::Quit() {
@@ -563,17 +587,38 @@ void RsgEngine::Quit() {
 
     //destroy window
     SDL_DestroyWindow(window);
+
+    if (guiEngine != NULL) {
+        guiEngine->Quit();
+    }
+
+    delete(this);
 }
 
 /*CharData* GetCharDataPtr() {
     return charData;
 }*/
 
+bool RsgEngine::SetGuiEngine(RsgGuiEngine* engine) {
+    bool updated = (guiEngine != NULL);
+    guiEngine = engine;
+    return updated;
+}
+
+rsd::uint2* RsgEngine::GetDisplaySize() {
+    return new (rsd::uint2){chars_per_line, n_lines};
+}
+
+Uint32 RsgEngine::PointToIndex(rsd::uint2 point) {
+    return (point.y * GetDisplaySize()->x) + point.x;
+}
+
 bool RsgEngine::SetCharacter(Uint32 index, rsd::CharData* data) {
     if (index >= n_chars) {
         return false;
     }
     charData[index] = *data;
+    return true;
 }
 
 Uint32 RsgEngine::FillCharacter(Uint32 index, Uint32 count, rsd::CharData* data) {
@@ -586,12 +631,4 @@ Uint32 RsgEngine::FillCharacter(Uint32 index, Uint32 count, rsd::CharData* data)
         ++chars_modified;
     }
     return chars_modified;
-}
-
-rsd::uint2* RsgEngine::GetDisplaySize() {
-    return new (rsd::uint2){chars_per_line, n_lines};
-}
-
-Uint32 RsgEngine::PointToIndex(rsd::uint2 point) {
-    return (point.y * GetDisplaySize()->x) + point.x;
 }

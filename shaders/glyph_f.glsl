@@ -15,6 +15,12 @@ layout (location=0) out vec4 outColour;
 void main() {
 	vec4 texColour = texture(fontImage, glyphCoords) 
 		+ texture(fontImage, glyph2Coords) ;
-		
+	
+	texColour = clamp(
+		texColour, 
+		vec4(0.0f,0.0f,0.0f,0.0f),
+		vec4(1.0f,1.0f,1.0f,1.0f)	
+	);
+	
 	outColour = (glyphTint * texColour) + (glyphBG * (1.0f - texColour.a));
 }

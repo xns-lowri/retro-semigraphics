@@ -3,6 +3,8 @@
 //soz, am an old C coder stuck in a slightly younger C coder's body
 
 namespace rsd {
+    //typedef bool (*callback_ptr)(SDL_Event* event);
+
     //character data struct, layout for vert shader
     //todo maybe: operator overloads
     struct CharData

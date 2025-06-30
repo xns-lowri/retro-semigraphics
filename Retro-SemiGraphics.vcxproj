@@ -20,13 +20,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cppsrc\app-main.cpp" />
-    <ClCompile Include="cppsrc\rsg-graphics.cpp" />
+    <ClCompile Include="cppsrc\rsg-gui-engine.cpp" />
     <ClCompile Include="cppsrc\rsg-sdl-engine.cpp" />
+    <ClCompile Include="cppsrc\rsg-window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cpph\rsfonts.h" />
     <ClInclude Include="cpph\rsg-datatypes.h" />
-    <ClInclude Include="cpph\rsg-graphics.h" />
+    <ClInclude Include="cpph\rsg-gui-engine.h" />
     <ClInclude Include="cpph\rsg-sdl-engine.h" />
+    <ClInclude Include="cpph\rsg-window.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
