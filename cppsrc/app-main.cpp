@@ -55,7 +55,6 @@ static RsgGuiEngine* gui;
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 {
     main_window = new RsgEngine();
-    gui = new RsgGuiEngine(main_window);
 
     //Init SDL engine, handles window+GPU and streaming chardata
     SDL_AppResult rsg_result = 

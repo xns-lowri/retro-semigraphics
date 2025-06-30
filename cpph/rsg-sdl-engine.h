@@ -44,7 +44,6 @@ class RsgEngine {
 
 public:
     RsgEngine();
-    RsgEngine(Uint32 rscale);
 
     /* SDL mirror functions */
     SDL_AppResult Init(
