@@ -3,6 +3,7 @@
 #include "../cpph/rsg-datatypes.h"
 #include "../cpph/rsg-sdl-engine.h"
 #include "../cpph/rsg-gui-engine.h"
+#include "../cpph/rsfonts.h"
 
 /* RsgGuiEngine Class constructor */
 	RsgGuiEngine::RsgGuiEngine(RsgEngine* window) {
@@ -51,7 +52,7 @@
 		rsd::CharData* title_char = new (rsd::CharData){
 			titlefgcol.x, titlefgcol.y, titlefgcol.z, titlefgcol.w,
 			titlebgcol.x, titlebgcol.y, titlebgcol.z, titlebgcol.w,
-			336, ' ', 0, 0
+			RSG_TITLE_BORDERS + TITLE_FULL, ' ', 0, 0
 		};
 		//draw title bar bg
 		parentWindow->FillCharacter(start_index, size.x, title_char);
@@ -60,25 +61,25 @@
 		Uint32 title_rel_start = (size.x - titletext.length() + 2) / 2;
 
 		//window left joiner
-		title_char->char1 = 344; //todo consts/defs for nonstandard chars
+		title_char->char1 = RSG_TITLE_BORDERS + TITLE_RIGHT_JOIN_SINGLE; //todo consts/defs for nonstandard chars
 		parentWindow->SetCharacter(
 			start_index,
 			title_char
 		);
 		//before title text joiner
-		title_char->char1 = 341; //todo consts/defs for nonstandard chars
+		title_char->char1 = RSG_TITLE_BORDERS + TITLE_HALF_LEFT; //todo consts/defs for nonstandard chars
 		parentWindow->SetCharacter(
 			start_index + title_rel_start,
 			title_char
 		);
 		//after title text joiner
-		title_char->char1 = 340;
+		title_char->char1 = RSG_TITLE_BORDERS + TITLE_HALF_RIGHT;
 		parentWindow->SetCharacter(
 			start_index + 1 + title_rel_start + titletext.length(),
 			title_char
 		);
 		//window right joiner
-		title_char->char1 = 345; //todo consts/defs for nonstandard chars
+		title_char->char1 = RSG_TITLE_BORDERS + TITLE_LEFT_JOIN_SINGLE; //todo consts/defs for nonstandard chars
 		parentWindow->SetCharacter(
 			start_index + size.x - 1,
 			title_char
@@ -108,7 +109,7 @@
 				next_origin.x, next_origin.y, line_index);*/
 			bg_char->char1 = ' ';
 			parentWindow->FillCharacter(line_index + 1, size.x - 2, bg_char);
-			bg_char->char1 = 257;
+			bg_char->char1 = RSG_LINE_SINGLE + LINE_VERT;
 			parentWindow->SetCharacter(line_index, bg_char);
 			parentWindow->SetCharacter(line_index + size.x - 1, bg_char);
 		}
@@ -116,11 +117,11 @@
 		rsd::uint2 next_origin = { 0, size.y - 1 };
 		next_origin += origin;
 		Uint32 line_index = parentWindow->PointToIndex(next_origin);
-		bg_char->char1 = 258;
+		bg_char->char1 = RSG_LINE_SINGLE + LINE_HORIZ;
 		parentWindow->FillCharacter(line_index + 1, size.x - 2, bg_char);
-		bg_char->char1 = 264;
+		bg_char->char1 = RSG_LINE_SINGLE + LINE_RA_UP_RIGHT;
 		parentWindow->SetCharacter(line_index, bg_char);
-		bg_char->char1 = 267;
+		bg_char->char1 = RSG_LINE_SINGLE + LINE_RA_UP_LEFT;
 		parentWindow->SetCharacter(line_index + size.x - 1, bg_char);
 
 
