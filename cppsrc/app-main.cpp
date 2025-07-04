@@ -47,8 +47,8 @@
 //list of verts
 const rsd::uint2 display_size = { 100, 32 };
 
-RsgEngine* rsg_engine;
-RsgGuiEngine* rsg_gui;
+RsgEngine* rsg_sdl_eng;
+RsgGuiEngine* rsg_gui_eng;
 
 //static Uint32 n_chars = 0;  //total number of glyphs on screen
 //rsd::CharData* debug;
@@ -56,17 +56,18 @@ RsgGuiEngine* rsg_gui;
 /* This function is called once by SDL when program is started */
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 {
-    rsg_engine = new RsgEngine();
-    rsg_gui = new RsgGuiEngine(rsg_engine);
+    rsg_sdl_eng = new RsgEngine();
+    rsg_gui_eng = new RsgGuiEngine(rsg_sdl_eng);
 
     //Init SDL engine, handles window+GPU and streaming chardata
     SDL_AppResult rsg_result = 
-        rsg_engine->Init(    
+        rsg_sdl_eng->Init(    
             display_size,   //create display with specified dims (chars, not px)
             2,              //scale of 2 because i can't see too good
             false,          //don't allow resizing
             "gtest32.bmp"   //using 32 glyphs per row test font
         );
+
     if (rsg_result != SDL_APP_CONTINUE) {
         return rsg_result;  //quit early on error
     }
@@ -74,15 +75,19 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
     rsgui::Window* main_window = new rsgui::Window(
         rsd::uint2(0, 0),
         rsd::uint2(display_size.x, display_size.y),
-        "Hello Borld",
+        "This Is A Test Window",
         rsd::float4(0.8f, 0.8f, 0.8f, 1.0f),
         rsd::float4(0.2f, 0.2f, 0.2f, 1.0f)
     );
+    //main_window->SetBorder(rsgui::RSG_WINDOW_BORDER_DOUBLE);
 
-    rsg_gui->SetRenderableComponent(main_window);
+    rsg_gui_eng->SetRenderableComponent(main_window);
+
+    SDL_Log("Ready to render!");
 
     //debug draw window
-    rsg_gui->drawWindow(
+    /*
+    rsg_gui_eng->drawWindow(
         rsd::uint2(0, 0),
         rsd::uint2(display_size.x, display_size.y), //display_size,
         rsd::float4(0.8f,0.8f,0.8f,1.0f),
@@ -90,7 +95,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
         rsd::float4(0.8f,0.8f,0.8f,1.0f),
         rsd::float4(0.2f,0.2f,0.2f,1.0f),
         "Test Window - hello"
-    );
+    );*/
 
     /*rseng::SetCharacter(rseng::PointToIndex(
         rsd::uint2(3, 2)),
@@ -114,7 +119,7 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
     //todo app events handler
     
     //todo update (repaint) graphics - use callback
-    return rsg_engine->Event(event);
+    return rsg_sdl_eng->Event(event);
 }
 
 /* This function runs once per frame, and is the heart of the program. */
@@ -122,7 +127,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 {
     //update char buffer before render pass?
 
-    SDL_AppResult rsg_result = rsg_engine->Render();
+    SDL_AppResult rsg_result = rsg_sdl_eng->Render();
     if (rsg_result != SDL_APP_CONTINUE) {
         return rsg_result;
     }
@@ -133,5 +138,5 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 /* This function runs once at shutdown. */
 void SDL_AppQuit(void* appstate, SDL_AppResult result)
 {
-    rsg_engine->Quit();
+    rsg_sdl_eng->Quit();
 }

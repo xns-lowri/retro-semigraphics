@@ -21,6 +21,7 @@ public:
 
 	//Render method called by sdl engine itself
 	void Render(RsgEngine* engine);
+	void RenderNext(RsgEngine* engine, rsgui::Component* component);
 
 	void SetRenderableComponent(rsgui::Component* comp);
 

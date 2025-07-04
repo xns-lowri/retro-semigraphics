@@ -47,7 +47,8 @@ RsgEngine::RsgEngine()
     glyphsize = { 0.f,0.f };
     glyphmapsize = { 0.f,0.f };
 
-    window = NULL; device = NULL;
+    window = NULL; 
+    device = NULL;
 
     charDataBuffer = NULL;
     charDataPtr = NULL;
@@ -429,9 +430,10 @@ SDL_AppResult RsgEngine::Render() {
     /*for (Uint32 n = 256; n < n_chars; ++n) {
         charData[n].char1++;
     }*/
+
+    //update screen data from gui engine
     if (guiEngine != NULL) {
-        //todo repaint
-        guiEngine->Render(this);
+        guiEngine->Render(this); //repaint all
     }
 
     //calc framerate
@@ -624,6 +626,9 @@ rsd::uint2* RsgEngine::GetDisplaySize() {
     return new (rsd::uint2){chars_per_line, n_lines};
 }
 
+Uint32 RsgEngine::PointToIndex(Uint32 x, Uint32 y) {
+    return (y * GetDisplaySize()->x) + x;
+}
 Uint32 RsgEngine::PointToIndex(rsd::uint2 point) {
     return (point.y * GetDisplaySize()->x) + point.x;
 }

@@ -67,6 +67,7 @@ public:
     rsd::uint2* GetDisplaySize();
 
     //Get chardata array index from x,y point in display 
+    Uint32 PointToIndex(Uint32 x, Uint32 y);
     Uint32 PointToIndex(rsd::uint2 point);
 
     /* Data setters */

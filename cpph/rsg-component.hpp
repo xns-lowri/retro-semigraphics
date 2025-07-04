@@ -163,7 +163,7 @@ namespace rsgui {
 
 	/* Container abstract class */
 	class Container {
-	protected:
+	public:
 		ComponentList* children;
 	};
 };

@@ -90,6 +90,9 @@
 #define TITLE_BREAK_RIGHT		6 
 #define TITLE_BREAK_LEFT		7 
 
+#define TITLE_RIGHT_JOIN		8 //todo fix window
+#define TITLE_LEFT_JOIN			9 //todo fix window
+
 #define TITLE_RIGHT_JOIN_SINGLE		8 
 #define TITLE_LEFT_JOIN_SINGLE		9 
 #define TITLE_RIGHT_JOIN_DOUBLE		10 
