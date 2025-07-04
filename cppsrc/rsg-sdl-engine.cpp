@@ -429,6 +429,10 @@ SDL_AppResult RsgEngine::Render() {
     /*for (Uint32 n = 256; n < n_chars; ++n) {
         charData[n].char1++;
     }*/
+    if (guiEngine != NULL) {
+        //todo repaint
+        guiEngine->Render(this);
+    }
 
     //calc framerate
     Uint64 this_tick = SDL_GetTicksNS();

@@ -22,6 +22,18 @@
 		delete(this);
 	}
 
+	void RsgGuiEngine::Render(RsgEngine* engine) {
+		if (renderableComponent == NULL) {
+			return;
+		}
+		renderableComponent->Repaint(engine);
+	}
+
+	//set main renderable component
+	void RsgGuiEngine::SetRenderableComponent(rsgui::Component* comp) {
+		renderableComponent = comp;
+	}
+
 	//debug function, todo refactor
 	bool RsgGuiEngine::drawWindow(
 		rsd::uint2 origin,

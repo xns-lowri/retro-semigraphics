@@ -24,9 +24,6 @@
     <ClCompile Include="cppsrc\rsg-gui-engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cppsrc\rsg-window.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpph\rsg-sdl-engine.h">
@@ -38,16 +35,16 @@
     <ClInclude Include="cpph\rsg-datatypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cpph\rsg-window.h">
+    <ClInclude Include="cpph\rsg-window.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="cpph\rsfonts.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cpph\rsg-component.h">
+    <ClInclude Include="cpph\rsg-component.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cpph\rsg-component.hpp">
+    <ClInclude Include="cpph\rsg-button.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

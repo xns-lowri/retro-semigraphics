@@ -41,6 +41,8 @@
 #include "../cpph/rsg-sdl-engine.h"
 #include "../cpph/rsg-gui-engine.h"
 
+#include "../cpph/rsg-window.hpp"
+
 /* Static variables */
 //list of verts
 const rsd::uint2 display_size = { 100, 32 };
@@ -61,7 +63,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
     SDL_AppResult rsg_result = 
         rsg_engine->Init(    
             display_size,   //create display with specified dims (chars, not px)
-            3,              //scale of 2 because i can't see too good
+            2,              //scale of 2 because i can't see too good
             false,          //don't allow resizing
             "gtest32.bmp"   //using 32 glyphs per row test font
         );
@@ -69,6 +71,15 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
         return rsg_result;  //quit early on error
     }
 
+    rsgui::Window* main_window = new rsgui::Window(
+        rsd::uint2(0, 0),
+        rsd::uint2(display_size.x, display_size.y),
+        "Hello Borld",
+        rsd::float4(0.8f, 0.8f, 0.8f, 1.0f),
+        rsd::float4(0.2f, 0.2f, 0.2f, 1.0f)
+    );
+
+    rsg_gui->SetRenderableComponent(main_window);
 
     //debug draw window
     rsg_gui->drawWindow(
