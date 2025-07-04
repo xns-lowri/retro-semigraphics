@@ -44,5 +44,11 @@
     <ClInclude Include="cpph\rsfonts.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="cpph\rsg-component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cpph\rsg-component.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

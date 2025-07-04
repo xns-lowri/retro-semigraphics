@@ -69,6 +69,8 @@ SDL_AppResult RsgEngine::Init(
 {
     //todo request screen size and scale?
     //system screen scaling?
+    scale = rscale;
+
     chars_per_line = display_size.x;
     n_lines = display_size.y;
 
@@ -124,6 +126,15 @@ SDL_AppResult RsgEngine::Init(
     //SDL_SetWindowMaximumSize(window, w_width, w_height);
 
     //SDL_SetWindowSize(window, w_width / 2, w_height / 2);
+
+    SDL_Log("GPU shader format support:");
+    SDL_Log("Invalid: %i", SDL_GPUSupportsShaderFormats(SDL_GPU_SHADERFORMAT_INVALID, NULL));
+    SDL_Log("Private: %i", SDL_GPUSupportsShaderFormats(SDL_GPU_SHADERFORMAT_PRIVATE, NULL));
+    SDL_Log("SPIR-V: %i", SDL_GPUSupportsShaderFormats(SDL_GPU_SHADERFORMAT_SPIRV, NULL));
+    SDL_Log("DX12 DXBC: %i", SDL_GPUSupportsShaderFormats(SDL_GPU_SHADERFORMAT_DXBC, NULL));
+    SDL_Log("DX12 DXIL: %i", SDL_GPUSupportsShaderFormats(SDL_GPU_SHADERFORMAT_DXIL, NULL));
+    SDL_Log("MSL Metal: %i", SDL_GPUSupportsShaderFormats(SDL_GPU_SHADERFORMAT_MSL, NULL));
+    SDL_Log("metallib: %i", SDL_GPUSupportsShaderFormats(SDL_GPU_SHADERFORMAT_METALLIB, NULL));
 
     /* Create GPU device*/
     device = SDL_CreateGPUDevice(SDL_GPU_SHADERFORMAT_SPIRV, true, NULL);

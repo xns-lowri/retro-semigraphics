@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include "rsg-datatypes.h"
+#include "rsg-component.hpp"
 
 class Canvas;
 class HScroll;
@@ -17,9 +18,9 @@ namespace rsgui {
 		RSG_WINDOW_DECORATE_ALL
 	};
 
-	class Window {
-		rsd::uint2 position;
-		rsd::uint2 size;
+	class Window: public Component {
+		//rsd::uint2 position;
+		//rsd::uint2 size;
 		WindowType windowType;
 		WindowDecoration windowDecoration;
 

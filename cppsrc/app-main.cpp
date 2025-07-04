@@ -61,7 +61,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
     SDL_AppResult rsg_result = 
         rsg_engine->Init(    
             display_size,   //create display with specified dims (chars, not px)
-            2,              //scale of 2 because i can't see too good
+            3,              //scale of 2 because i can't see too good
             false,          //don't allow resizing
             "gtest32.bmp"   //using 32 glyphs per row test font
         );
