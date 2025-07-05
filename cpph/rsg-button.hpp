@@ -43,7 +43,11 @@ namespace rsgui {
 			this->inhibitedBgCol = bgCol;
 
 			this->highlightable = true;
+			this->highlighted = false;
+
 			this->selectable = true;
+			this->selected = false;
+
 			this->inhibited = false;
 
 			buttonBorder = RSG_BUTTON_BORDER_NONE;
@@ -57,13 +61,14 @@ namespace rsgui {
 			buttonText = text;
 		}
 
-		void OnHighlighted() {
+		//todo?
+		/*void OnHighlighted() {
 
 		}
 
 		void OnSelected() {
 
-		}
+		}*/
 
 		Uint32 GetBorderChar(Uint32 offset) {
 			Uint32 ret_code = ' ';
@@ -91,6 +96,15 @@ namespace rsgui {
 			rsd::CharData* tmp_char = new rsd::CharData(
 				fgCol, bgCol, ' ', ' '
 			);
+
+			if (highlighted) {
+				tmp_char->SetForegroundColour(highlightedFgCol);
+				tmp_char->SetBackgroundColour(highlightedBgCol);
+			}
+			if (selected) {
+				tmp_char->SetForegroundColour(selectedFgCol);
+				tmp_char->SetBackgroundColour(selectedBgCol);
+			}
 
 			//todo actually draw the button
 

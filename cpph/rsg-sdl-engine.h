@@ -76,9 +76,13 @@ public:
     //Get number of characters in display
     Uint32 GetCharacterCount();
 
-    //Get chardata array index from x,y point in display 
+    //Get chardata array index from char x,y points in display 
     Uint32 PointToIndex(Uint32 x, Uint32 y);
+    //Get chardata array index from char x,y uint2
     Uint32 PointToIndex(rsd::uint2 point);
+
+    //get char index from pixel position in window
+    rsd::uint2 ScreenPointToCharXY(rsd::float2 point);
 
     /* Data setters */
     //character setters setters

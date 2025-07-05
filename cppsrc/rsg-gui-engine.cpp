@@ -36,7 +36,37 @@ SDL_AppResult RsgGuiEngine::Event(SDL_Event* event) {
 	//SDL_Log("Graphics event!");
 	
 	//todo handle various events
+	if (event->type == SDL_EVENT_MOUSE_MOTION) {
+		SDL_MouseMotionEvent mouse_event = event->motion;
+		rsd::uint2 mouse_charpos =
+			sdlEngine->ScreenPointToCharXY(
+				rsd::float2(mouse_event.x, mouse_event.y)
+			);
+		Uint32 mouse_charindex = sdlEngine->PointToIndex(mouse_charpos);
 
+		//SDL_Log("Mouse is at char x:%i, y:%i", mouse_charpos.x, mouse_charpos.y);
+
+		rsgui::Component* thisMouseOver = 
+			sdlEngine->charMetadata[mouse_charindex].charOwner;
+
+		if (lastMouseOver != thisMouseOver) {
+			//SDL_Log("Moused over new element?");
+			rsgui::Selectable* lastHighlightable =
+				dynamic_cast<rsgui::Selectable*>(lastMouseOver);
+			if (lastHighlightable != NULL) {
+				lastHighlightable->SetHighlighted(false);
+			}
+
+			rsgui::Selectable* thisHighlightable = 
+				dynamic_cast<rsgui::Selectable*>(thisMouseOver);
+			if (thisHighlightable != NULL) {
+				thisHighlightable->SetHighlighted(true);
+			}
+
+			lastMouseOver = thisMouseOver;
+		}
+		//lastMouseOver;
+	}
 
 	return SDL_APP_CONTINUE;
 };

@@ -656,6 +656,14 @@ Uint32 RsgEngine::PointToIndex(rsd::uint2 point) {
     return (point.y * GetDisplaySize().x) + point.x;
 }
 
+rsd::uint2 RsgEngine::ScreenPointToCharXY(rsd::float2 point) {
+    rsd::uint2 charPos = rsd::uint2(
+        static_cast<Uint32>(std::floor((chars_per_line * point.x) / w_width) ),
+        static_cast<Uint32>(std::floor((n_lines * point.y) / w_height) )
+    );
+    return charPos;
+}
+
 /* Set one character */
 bool RsgEngine::SetCharacter(
     Uint32 index, 

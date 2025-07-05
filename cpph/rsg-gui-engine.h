@@ -16,8 +16,11 @@ class RsgGuiEngine {
 	rsgui::Component* renderableComponent;	//main renderable component
 	//std::string titleText;		//window title text
 
+	//todo soc?
+	rsgui::Component* lastMouseOver;
+
 public:
-	RsgGuiEngine(RsgEngine* window);
+	RsgGuiEngine(RsgEngine* engine);
 	rsgui::Window* InitEngineWindow(
 		std::string title,
 		rsd::float4 fgCol,

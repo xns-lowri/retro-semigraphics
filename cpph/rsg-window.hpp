@@ -72,7 +72,12 @@ namespace rsgui {
 				titleFgCol,
 				titleBgCol
 			);
+			//set quit button properties
 			quit_btn->SetBorder(RSG_BUTTON_BORDER_TITLE);
+			quit_btn->SetHighlightedBackgroundColour(
+				rsd::float4(0.5f, 0.0f, 0.0f, 1.0f)
+			);
+
 			children->AddComponent(quit_btn);
 
 			/* Main window has minimise button */
@@ -87,7 +92,11 @@ namespace rsgui {
 				titleFgCol,
 				titleBgCol
 			);
+			//set minimise button properties
 			minimise_btn->SetBorder(RSG_BUTTON_BORDER_TITLE);
+			minimise_btn->SetHighlightedBackgroundColour(
+				rsd::float4(0.02f, 0.05f, 0.5f, 1.0f)
+			);
 			children->AddComponent(minimise_btn);
 
 			//Todo maximise/restore? Deal with resizing l8r D=

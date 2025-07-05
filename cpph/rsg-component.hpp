@@ -23,9 +23,11 @@ namespace rsgui {
 	class Selectable {
 	protected:
 		bool highlightable;
+		bool highlighted;
 		rsd::float4 highlightedFgCol;
 		rsd::float4 highlightedBgCol;
 		bool selectable;
+		bool selected;
 		rsd::float4 selectedFgCol;
 		rsd::float4 selectedBgCol;
 	public:
@@ -38,9 +40,17 @@ namespace rsgui {
 		}
 		void SetHighlightable(bool highlightable) {
 			this->highlightable = highlightable;
+			//clear highlighted if false
+			highlighted = highlighted && highlightable;
 		}
 		bool GetHighlightable() {
 			return highlightable;
+		}
+		void SetHighlighted(bool highlighted) {
+			this->highlighted = highlighted;
+		}
+		bool GetHighlighted() {
+			return highlighted;
 		}
 
 		/* Select methods */
@@ -52,9 +62,17 @@ namespace rsgui {
 		}
 		void SetSelectable(bool selectable) {
 			this->selectable = selectable;
+			//clear selected if false
+			selected = selected && selectable;
 		}
 		bool GetSelectable() {
 			return selectable;
+		}
+		void SetSelected(bool selected) {
+			this->selected = selected;
+		}
+		bool GetSelected() {
+			return selected;
 		}
 
 		/* Callback methods */
