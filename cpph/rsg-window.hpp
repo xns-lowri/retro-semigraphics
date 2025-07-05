@@ -77,6 +77,12 @@ namespace rsgui {
 			quit_btn->SetHighlightedBackgroundColour(
 				rsd::float4(0.5f, 0.0f, 0.0f, 1.0f)
 			);
+			quit_btn->SetSelectedForegroundColour(
+				rsd::float4(0.5f, 0.0f, 0.0f, 1.0f)
+			);
+			quit_btn->SetSelectedBackgroundColour(
+				rsd::float4(0.8f, 0.8f, 0.8f, 1.0f)
+			);
 
 			children->AddComponent(quit_btn);
 
@@ -96,6 +102,12 @@ namespace rsgui {
 			minimise_btn->SetBorder(RSG_BUTTON_BORDER_TITLE);
 			minimise_btn->SetHighlightedBackgroundColour(
 				rsd::float4(0.02f, 0.05f, 0.5f, 1.0f)
+			);
+			minimise_btn->SetSelectedForegroundColour(
+				rsd::float4(0.02f, 0.05f, 0.5f, 1.0f)
+			);
+			minimise_btn->SetSelectedBackgroundColour(
+				rsd::float4(0.8f, 0.8f, 0.8f, 1.0f)
 			);
 			children->AddComponent(minimise_btn);
 

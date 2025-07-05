@@ -55,10 +55,10 @@ namespace rsgui {
 
 		/* Select methods */
 		void SetSelectedForegroundColour(rsd::float4 col) {
-			highlightedFgCol = col;
+			selectedFgCol = col;
 		}
 		void SetSelectedBackgroundColour(rsd::float4 col) {
-			highlightedBgCol = col;
+			selectedBgCol = col;
 		}
 		void SetSelectable(bool selectable) {
 			this->selectable = selectable;

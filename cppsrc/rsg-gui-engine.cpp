@@ -51,21 +51,44 @@ SDL_AppResult RsgGuiEngine::Event(SDL_Event* event) {
 
 		if (lastMouseOver != thisMouseOver) {
 			//SDL_Log("Moused over new element?");
-			rsgui::Selectable* lastHighlightable =
+			rsgui::Selectable* lastSelectable =
 				dynamic_cast<rsgui::Selectable*>(lastMouseOver);
-			if (lastHighlightable != NULL) {
-				lastHighlightable->SetHighlighted(false);
+			if (lastSelectable != NULL) {
+				lastSelectable->SetHighlighted(false);
+				lastSelectable->SetSelected(false);
 			}
 
-			rsgui::Selectable* thisHighlightable = 
+			rsgui::Selectable* thisSelectable = 
 				dynamic_cast<rsgui::Selectable*>(thisMouseOver);
-			if (thisHighlightable != NULL) {
-				thisHighlightable->SetHighlighted(true);
+			if (thisSelectable != NULL) {
+				thisSelectable->SetHighlighted(true);
 			}
 
 			lastMouseOver = thisMouseOver;
 		}
 		//lastMouseOver;
+	}
+
+	if (event->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+		//SDL_Log("Mouse button down event");
+		rsgui::Selectable* lastSelectable =
+			dynamic_cast<rsgui::Selectable*>(lastMouseOver);
+		if (lastSelectable != NULL) {
+			lastSelectable->SetSelected(true);
+		}
+	}
+
+	if (event->type == SDL_EVENT_MOUSE_BUTTON_UP) {
+		//SDL_Log("Mouse button up event");
+		rsgui::Selectable* lastSelectable =
+			dynamic_cast<rsgui::Selectable*>(lastMouseOver);
+		if (lastSelectable != NULL) {
+			if (lastSelectable->GetSelected()) {
+				SDL_Log("Mouse clicked event!");
+				//todo callback
+				lastSelectable->SetSelected(false);
+			}
+		}
 	}
 
 	return SDL_APP_CONTINUE;
