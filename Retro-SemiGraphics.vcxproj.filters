@@ -24,6 +24,9 @@
     <ClCompile Include="cppsrc\rsg-gui-engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="cppsrc\rsg-CharData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpph\rsg-sdl-engine.h">

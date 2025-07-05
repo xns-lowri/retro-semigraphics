@@ -19,32 +19,67 @@ namespace rsgui {
 		virtual void Paint(RsgEngine* engine) {};
 	};
 
-	/* components that change when moused over or kb select */
-	class Highlightable {
+	/* components that change when moused over/click or kb select */
+	class Selectable {
 	protected:
-		rsd::float4 fgColHighlight;
-		rsd::float4 bgColHighlight;
+		bool highlightable;
+		rsd::float4 highlightedFgCol;
+		rsd::float4 highlightedBgCol;
+		bool selectable;
+		rsd::float4 selectedFgCol;
+		rsd::float4 selectedBgCol;
 	public:
-		void SetForegroundHighlightColour(rsd::float4 col) {
-			fgColHighlight = col;
+		/* Highlight methods */
+		void SetHighlightedForegroundColour(rsd::float4 col) {
+			highlightedFgCol = col;
 		}
-		void SetBackgroundHighlightColour(rsd::float4 col) {
-			bgColHighlight = col;
+		void SetHighlightedBackgroundColour(rsd::float4 col) {
+			highlightedBgCol = col;
 		}
+		void SetHighlightable(bool highlightable) {
+			this->highlightable = highlightable;
+		}
+		bool GetHighlightable() {
+			return highlightable;
+		}
+
+		/* Select methods */
+		void SetSelectedForegroundColour(rsd::float4 col) {
+			highlightedFgCol = col;
+		}
+		void SetSelectedBackgroundColour(rsd::float4 col) {
+			highlightedBgCol = col;
+		}
+		void SetSelectable(bool selectable) {
+			this->selectable = selectable;
+		}
+		bool GetSelectable() {
+			return selectable;
+		}
+
+		/* Callback methods */
+		//virtual void OnHighlighted() {};
+		//virtual void OnSelected() {};
 	};
 
 	/* components that can be turned on or off */
-	class Enableable {
+	class Inhibitable {
 	protected:
-		bool enabled;
-		rsd::float4 fgColDisabled;
-		rsd::float4 bgColDisabled;
+		bool inhibited;
+		rsd::float4 inhibitedFgCol;
+		rsd::float4 inhibitedBgCol;
 	public:
-		void SetForegroundDisabledColour(rsd::float4 col) {
-			fgColDisabled = col;
+		void SetInhibitedForegroundColour(rsd::float4 col) {
+			inhibitedFgCol = col;
 		}
-		void SetBackgroundDisabledColour(rsd::float4 col) {
-			bgColDisabled = col;
+		void SetInhibitedBackgroundColour(rsd::float4 col) {
+			inhibitedBgCol = col;
+		}
+		void SetInhibited(bool inhibited) {
+			this->inhibited = inhibited;
+		}
+		bool GetInhibited() {
+			return inhibited;
 		}
 	};
 
@@ -112,10 +147,18 @@ namespace rsgui {
 			// referencing comp param, prev = current tail, next = null (end of list)
 			ComponentListNode* new_node = new ComponentListNode(comp, tail, NULL);
 
-			//set old tail's next ptr
-			tail->next = new_node;
+			//should be equivalent to n_items > 0
+			if (tail != NULL) {
+				//set old tail's next ptr
+				tail->next = new_node;
+			}
 
-			//set new tail and increment item count
+			//set head if this is the first node
+			if (n_items == 0) {
+				head = new_node;
+			}
+
+			//set tail and increment item count
 			tail = new_node;
 			++n_items;
 

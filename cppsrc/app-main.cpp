@@ -56,8 +56,8 @@ RsgGuiEngine* rsg_gui_eng;
 /* This function is called once by SDL when program is started */
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 {
+    //Create SDL engine object
     rsg_sdl_eng = new RsgEngine();
-    rsg_gui_eng = new RsgGuiEngine(rsg_sdl_eng);
 
     //Init SDL engine, handles window+GPU and streaming chardata
     SDL_AppResult rsg_result = 
@@ -67,21 +67,39 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
             false,          //don't allow resizing
             "gtest32.bmp"   //using 32 glyphs per row test font
         );
+    //quit early on error
+    if (rsg_result != SDL_APP_CONTINUE) { return rsg_result; }
 
-    if (rsg_result != SDL_APP_CONTINUE) {
-        return rsg_result;  //quit early on error
-    }
+    //Create GUI engine object
+    rsg_gui_eng = new RsgGuiEngine(rsg_sdl_eng);
+    SDL_Log("GUI Engine initialised");
 
-    rsgui::Window* main_window = new rsgui::Window(
+    //initialise gui engine object with Window object filling it
+    //we will interact with the Window pointer to build our GUI
+    rsgui::Window* main_window = rsg_gui_eng->InitEngineWindow(
+        "a.cpp",
+        rsd::float4(0.8f, 0.8f, 0.8f, 1.0f),
+        rsd::float4(0.2f, 0.2f, 0.2f, 1.0f)
+    );
+
+    //main_window->SetBorder(rsgui::RSG_WINDOW_BORDER_DOUBLE);
+    main_window->SetTitleBackgroundColour(
+        rsd::float4(0.1f, 0.1f, 0.1f, 1.0f)
+    );
+
+    main_window->CreateMainWindowControls();
+
+
+    /*rsgui::Window* main_window = new rsgui::Window(
         rsd::uint2(0, 0),
         rsd::uint2(display_size.x, display_size.y),
         "This Is A Test Window",
         rsd::float4(0.8f, 0.8f, 0.8f, 1.0f),
         rsd::float4(0.2f, 0.2f, 0.2f, 1.0f)
-    );
+    );*/
     //main_window->SetBorder(rsgui::RSG_WINDOW_BORDER_DOUBLE);
 
-    rsg_gui_eng->SetRenderableComponent(main_window);
+    //rsg_gui_eng->SetRenderableComponent(main_window);
 
     SDL_Log("Ready to render!");
 
@@ -106,6 +124,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
         }
     );*/
 
+    //debug get char codes lol
     //SDL_Log("\\0: %u, \\n: %u, \\r: %u, \\t: %u", '\0', '\n', '\r', '\t');
 
     return SDL_APP_CONTINUE;

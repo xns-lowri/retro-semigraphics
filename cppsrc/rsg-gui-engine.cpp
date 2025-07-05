@@ -4,17 +4,40 @@
 #include "../cpph/rsg-sdl-engine.h"
 #include "../cpph/rsg-gui-engine.h"
 #include "../cpph/rsg-component.hpp"
+#include "../cpph/rsg-window.hpp"
 #include "../cpph/rsfonts.h"
 
 /* RsgGuiEngine Class constructor */
-RsgGuiEngine::RsgGuiEngine(RsgEngine* window) {
-	parentWindow = window;
-	parentWindow->SetGuiEngine(this);
+RsgGuiEngine::RsgGuiEngine(RsgEngine* engine) {
+	sdlEngine = engine;
+	sdlEngine->SetGuiEngine(this);
+
+	renderableComponent = NULL;
+}
+
+rsgui::Window* RsgGuiEngine::InitEngineWindow(
+	std::string windowTitle,
+	rsd::float4 fgCol,
+	rsd::float4 bgCol
+) {
+	rsgui::Window* main_window = new rsgui::Window(
+		rsd::uint2(0, 0),
+		sdlEngine->GetDisplaySize(),
+		windowTitle,
+		fgCol,
+		bgCol
+	);
+	SetRenderableComponent(main_window);
+	return main_window;
 }
 
 /* Gui engine event handler - called by sdl event handler */
 SDL_AppResult RsgGuiEngine::Event(SDL_Event* event) {
 	//SDL_Log("Graphics event!");
+	
+	//todo handle various events
+
+
 	return SDL_APP_CONTINUE;
 };
 
@@ -33,27 +56,35 @@ void RsgGuiEngine::Render(RsgEngine* engine) {
 	RenderNext(engine, renderableComponent);
 }
 
+/* Render components recursively */
 void RsgGuiEngine::RenderNext(RsgEngine* engine, rsgui::Component* component) {
-	component->Repaint(engine);
+	component->Repaint(engine); //repaint current component
 
+	//check if current component is a container, and has child components
 	rsgui::Container* container = dynamic_cast<rsgui::Container*>(component);
-	if (container == NULL) { return; }
-	if (container->children == NULL) { return; }
+	if (container == NULL) { return; } //not container
+	if (container->children == NULL) { return; } //no kids
 
+	//call RenderNext on children in turn
+	//prioritises child components over sibling components at every level
 	for (Uint32 i = 0; i < container->children->Length(); ++i) {
 		//recursion :( 
-		RenderNext(engine, container->children->GetComponent(i));
+		rsgui::Component* next_kiddo = container->children->GetComponent(i);
+		if (next_kiddo == NULL) { continue; } //shouldn't happen?
+		//Render next child object
+		RenderNext(engine, next_kiddo);
 	}
-
 }
 
-//set main renderable component
+//set main renderable component, add all renderables to comp
+//to-don't preclude swapping renderable component to change screens
 void RsgGuiEngine::SetRenderableComponent(rsgui::Component* comp) {
 	renderableComponent = comp;
 }
 
 //debug function, todo refactor
-bool RsgGuiEngine::drawWindow(
+//commented pending removal
+/*bool RsgGuiEngine::drawWindow(
 	rsd::uint2 origin,
 	rsd::uint2 size,
 	rsd::float4 titlefgcol,
@@ -63,61 +94,57 @@ bool RsgGuiEngine::drawWindow(
 	std::string titletext
 )
 {
-	if (parentWindow == NULL) {
-		return false;
-	}
+	if (sdlEngine == NULL) 
+	{ return false; }
 
-	rsd::uint2* display_extents = parentWindow->GetDisplaySize();
+	if ( (origin + size) > sdlEngine->GetDisplaySize() 
+		|| (titletext.length() + 2) > size.x + 6 ) 
+	{ return false; }
 
-	if ((origin + size) > *display_extents ||
-		(titletext.length() + 2) > size.x + 6) {
-		return false;
-	}
-
-	Uint32 start_index = parentWindow->PointToIndex(origin);
+	Uint32 start_index = sdlEngine->PointToIndex(origin);
 
 	//SDL_Log("Point at (%i, %i) = %i", origin.x, origin.y, start_index);
 
-	//create title bg char
+	//create windowTitle bg char
 	rsd::CharData* title_char = new (rsd::CharData){
 		titlefgcol.x, titlefgcol.y, titlefgcol.z, titlefgcol.w,
 		titlebgcol.x, titlebgcol.y, titlebgcol.z, titlebgcol.w,
 		RSG_TITLE_BORDERS + TITLE_FULL, ' ', 0, 0
 	};
-	//draw title bar bg
-	parentWindow->FillCharacter(start_index, size.x, title_char);
+	//draw windowTitle bar bg
+	sdlEngine->FillCharacter(start_index, size.x, title_char);
 
-	//draw title text
+	//draw windowTitle text
 	Uint32 title_rel_start = (size.x - titletext.length() + 2) / 2;
 
-	//window left joiner
+	//engine left joiner
 	title_char->char1 = RSG_TITLE_BORDERS + TITLE_RIGHT_JOIN_SINGLE; //todo consts/defs for nonstandard chars
-	parentWindow->SetCharacter(
+	sdlEngine->SetCharacter(
 		start_index,
 		title_char
 	);
-	//before title text joiner
+	//before windowTitle text joiner
 	title_char->char1 = RSG_TITLE_BORDERS + TITLE_HALF_LEFT; //todo consts/defs for nonstandard chars
-	parentWindow->SetCharacter(
+	sdlEngine->SetCharacter(
 		start_index + title_rel_start,
 		title_char
 	);
-	//after title text joiner
+	//after windowTitle text joiner
 	title_char->char1 = RSG_TITLE_BORDERS + TITLE_HALF_RIGHT;
-	parentWindow->SetCharacter(
+	sdlEngine->SetCharacter(
 		start_index + 1 + title_rel_start + titletext.length(),
 		title_char
 	);
-	//window right joiner
+	//engine right joiner
 	title_char->char1 = RSG_TITLE_BORDERS + TITLE_LEFT_JOIN_SINGLE; //todo consts/defs for nonstandard chars
-	parentWindow->SetCharacter(
+	sdlEngine->SetCharacter(
 		start_index + size.x - 1,
 		title_char
 	);
 
 	for (Uint32 c = 0; c < titletext.length(); ++c) {
 		title_char->char1 = titletext.at(c);
-		parentWindow->SetCharacter(
+		sdlEngine->SetCharacter(
 			start_index + 1 + title_rel_start + c, 
 			title_char
 		);
@@ -134,27 +161,27 @@ bool RsgGuiEngine::drawWindow(
 	{
 		rsd::uint2 next_origin = { 0, bgline };
 		next_origin += origin;
-		Uint32 line_index = parentWindow->PointToIndex(next_origin);
-		/*SDL_Log("Line at (%i, %i) = %i",
-			next_origin.x, next_origin.y, line_index);*/
+		Uint32 line_index = sdlEngine->PointToIndex(next_origin);
+		/ *SDL_Log("Line at (%i, %i) = %i",
+			next_origin.x, next_origin.y, line_index);* /
 		bg_char->char1 = ' ';
-		parentWindow->FillCharacter(line_index + 1, size.x - 2, bg_char);
+		sdlEngine->FillCharacter(line_index + 1, size.x - 2, bg_char);
 		bg_char->char1 = RSG_LINE_SINGLE + LINE_VERT;
-		parentWindow->SetCharacter(line_index, bg_char);
-		parentWindow->SetCharacter(line_index + size.x - 1, bg_char);
+		sdlEngine->SetCharacter(line_index, bg_char);
+		sdlEngine->SetCharacter(line_index + size.x - 1, bg_char);
 	}
 
 	rsd::uint2 next_origin = { 0, size.y - 1 };
 	next_origin += origin;
-	Uint32 line_index = parentWindow->PointToIndex(next_origin);
+	Uint32 line_index = sdlEngine->PointToIndex(next_origin);
 	bg_char->char1 = RSG_LINE_SINGLE + LINE_HORIZ;
-	parentWindow->FillCharacter(line_index + 1, size.x - 2, bg_char);
+	sdlEngine->FillCharacter(line_index + 1, size.x - 2, bg_char);
 	bg_char->char1 = RSG_LINE_SINGLE + LINE_RA_UP_RIGHT;
-	parentWindow->SetCharacter(line_index, bg_char);
+	sdlEngine->SetCharacter(line_index, bg_char);
 	bg_char->char1 = RSG_LINE_SINGLE + LINE_RA_UP_LEFT;
-	parentWindow->SetCharacter(line_index + size.x - 1, bg_char);
+	sdlEngine->SetCharacter(line_index + size.x - 1, bg_char);
 
 
 
 	return true;
-}
+}*/

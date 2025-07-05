@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cppsrc\app-main.cpp" />
+    <ClCompile Include="cppsrc\rsg-CharData.cpp" />
     <ClCompile Include="cppsrc\rsg-gui-engine.cpp" />
     <ClCompile Include="cppsrc\rsg-sdl-engine.cpp" />
   </ItemGroup>

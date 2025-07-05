@@ -5,13 +5,13 @@ Text-mode user interface rendering engine in C++ and GLSL, using SDL3.
 
 Welcome to my first GitHub repo!
 
-Retro-semigraphics is envisaged as a GUI toolkit for creating text-mode-style applications on modern GUI desktop environments.
+Retro-semigraphics is envisaged as a rendering engine and GUI toolkit for creating modern text-mode-style applications.
 
-My goals for this project revolve around learning C++ and shader coding, learning more about how source code turns into executable instructions, and learning about the interaction between an application and the OS and underlying hardware.
+My goals for this project revolve around learning C++ and shader coding, learning more about how source code turns into executable instructions, and understanding the interactions between an application and the host OS and underlying hardware. 
 
 ## What it is
 
-Retro-semigraphics is at its core a 'terminal emulator', not in the normal sense, but in the sense that it emulates the 'text-mode' graphics of early IBM-compatible PCs on modern environments - GUI applications are built upon and rendered entirely out of fixed-size glyphs. Essentially, the worst of both worlds!
+Retro-semigraphics is at its core a 'terminal emulator', not in the normal sense, but in the sense that applications are built upon and rendered entirely out of fixed-size font glyphs in fixed positions on the screen, emulating the 'text-mode' graphics of early IBM-compatible PCs on contemporary desktop environments. Essentially, the worst of both worlds!
 
 ## What it does
 
@@ -29,7 +29,7 @@ Common interface classes for GUI elements are defined in `rsg-component.hpp`.
 
 The GUI engine `rsg-gui-engine.cpp` is responsible for keeping track of the various GUI elements in our design, and for allowing elements to be added, configured, and removed from the design.
 
-The GUI engine also co-ordinates the rendering of GUI elements on each render pass, iterating through elements and calling their rendering routines. 
+The GUI engine also co-ordinates the 'painting' of GUI elements on each render pass, iterating through elements and calling their `Repaint()` routines to generate the next frame of character data before transfer to the GPU. 
 
 #### Further development 
 
@@ -41,9 +41,9 @@ The GUI engine also co-ordinates the rendering of GUI elements on each render pa
 
 ### SDL Engine
 
-The SDL engine `rsg-sdl-engine.cpp` is responsible for setting up the GPU and transferring `CharData` to the shaders on each frame of the rendering cycle. 
+The SDL engine `rsg-sdl-engine.cpp` is responsible for setting up the GPU before rendering begins, and transferring character data to the GPU on each frame of the rendering cycle. This module makes all calls to the SDL3 libraries and serves as an interface between SDL3 and the GUI engine.
 
-It's quite daunting to look at (even for me having written it) but it's really just a lot of boilerplate code for loading the shader code onto the GPU and setting up the appropriate buffers and GPU configuration to get our render data into the locations expected by our shaders.
+It's quite daunting to look at (even for me having written it), but it's really just a lot of boilerplate code for loading the shader code onto the GPU and setting up the appropriate buffers and GPU configuration to get our font texture and character data into the locations expected by our shaders.
 
 ### Text Shaders
 
@@ -66,12 +66,14 @@ For the first release version of this project, I'm aiming to implement the follo
 - GUI manager
     - Add Elements ✔
     - Render Elements ✔
-    - Integrate `Window` creation `WIP`
+    - InitWithWindow ✔
     - GUI Events `WIP`
+        - Keyboard Events
+        - Mouse Events
 - GUI Elements
     - Window ✔
     - Button `WIP`
-    - Canvas `TODO`
+    - Canvas `?`
     - Scrollbar `TODO`
     - Text Box, Text Area `TODO`
     - Checkbox `TODO`

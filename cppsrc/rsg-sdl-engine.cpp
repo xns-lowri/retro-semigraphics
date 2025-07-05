@@ -58,6 +58,8 @@ RsgEngine::RsgEngine()
     charTransferBuffer = NULL;
     texTransferBuffer = NULL;
     graphicsPipeline = NULL;
+
+    guiEngine = NULL;
 }
 
 /* Call in SDL_AppInit to create window */
@@ -102,6 +104,14 @@ SDL_AppResult RsgEngine::Init(
         SDL_Log("Couldn't allocate memory for char array: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
+
+    //init character metadata array
+    charMetadata = new rsd::CharMetadata[n_chars];
+    if (charMetadata == NULL) {
+        SDL_Log("Couldn't allocate memory for char metadata array: %s", SDL_GetError());
+        return SDL_APP_FAILURE;
+    }
+
     //initialise char buffer data
     FillCharacter(
         0, n_chars, 
@@ -109,8 +119,9 @@ SDL_AppResult RsgEngine::Init(
             FG_COL, FG_COL, FG_COL, 1.0f,   //fg colour with full opacity
             0.0f, 0.0f, 0.0f, 0.0f,         //transparent bg
             ' ', ' ',   //init all data to space
-            0, 0        //init padding
-        });
+        },
+        NULL //no owner
+    );
 
     /* Create the window */
     window = SDL_CreateWindow("Oldskool Fonts Utility", w_width, w_height, NULL);
@@ -566,6 +577,7 @@ SDL_AppResult RsgEngine::Render() {
     return SDL_APP_CONTINUE;
 }
 
+/* Call in SDL_AppEvent to handle app events */
 SDL_AppResult RsgEngine::Event(SDL_Event* event) {
     //return early if quit event
     //todo may need to intercept for e.g. save changes alert
@@ -588,6 +600,7 @@ SDL_AppResult RsgEngine::Event(SDL_Event* event) {
     return appResult;
 }
 
+/* Call in SDL_Quit to close the app gracefully */
 void RsgEngine::Quit() {
     //release buffers
     SDL_ReleaseGPUBuffer(device, charDataBuffer);
@@ -605,49 +618,72 @@ void RsgEngine::Quit() {
     //destroy window
     SDL_DestroyWindow(window);
 
+    //quit GUI engine 
+    // - todo destroys all gui elements?
+    // - or is that our responsibility in app_main::Quit() ?
     if (guiEngine != NULL) {
         guiEngine->Quit();
     }
 
+    //delet this
     delete(this);
 }
 
-/*CharData* GetCharDataPtr() {
-    return charData;
-}*/
-
+//Set pointer to gui engine to call in Render(), return true if ptr changed
 bool RsgEngine::SetGuiEngine(RsgGuiEngine* engine) {
     bool updated = (guiEngine != NULL);
     guiEngine = engine;
     return updated;
 }
 
-rsd::uint2* RsgEngine::GetDisplaySize() {
-    return new (rsd::uint2){chars_per_line, n_lines};
+//Get display size as x,y uint2
+rsd::uint2 RsgEngine::GetDisplaySize() {
+    return rsd::uint2(chars_per_line, n_lines);
 }
 
+//Get number of character in buffer
+//todo not used since metadata moved here?
+Uint32 RsgEngine::GetCharacterCount() {
+    return n_chars;
+}
+
+//Get character linear buffer index from x,y points
 Uint32 RsgEngine::PointToIndex(Uint32 x, Uint32 y) {
-    return (y * GetDisplaySize()->x) + x;
+    return (y * GetDisplaySize().x) + x;
 }
+//Get character linear buffer index from x,y uint2
 Uint32 RsgEngine::PointToIndex(rsd::uint2 point) {
-    return (point.y * GetDisplaySize()->x) + point.x;
+    return (point.y * GetDisplaySize().x) + point.x;
 }
 
-bool RsgEngine::SetCharacter(Uint32 index, rsd::CharData* data) {
-    if (index >= n_chars) {
-        return false;
-    }
-    charData[index] = *data;
+/* Set one character */
+bool RsgEngine::SetCharacter(
+    Uint32 index, 
+    rsd::CharData* data, 
+    rsgui::Component* owner
+) {
+    if (index >= n_chars) { return false; } //exit loop if out of bounds
+    charData[index] = *data;                //set character data
+    charMetadata[index].charOwner = owner;  //set new owner
+    charMetadata[index].isDirty = false;    //not dirty
     return true;
 }
 
-Uint32 RsgEngine::FillCharacter(Uint32 index, Uint32 count, rsd::CharData* data) {
+/* Fill in a continuous block of identical characters
+ * This will wrap to the start of the next line, does not automatically justify
+ */
+Uint32 RsgEngine::FillCharacter(
+    Uint32 index, 
+    Uint32 count, 
+    rsd::CharData* data,
+    rsgui::Component* owner
+) {
     Uint32 chars_modified = 0;
     for (Uint32 i = index; i < index + count; ++i) {
-        if (i >= n_chars) {
-            break;
-        }
-        charData[i] = *data;
+        if (i >= n_chars) { break; }        //exit loop if out of bounds
+        charData[i] = *data;                //set character data
+        charMetadata[i].charOwner = owner;  //set new owner
+        charMetadata[i].isDirty = false;    //not dirty
         ++chars_modified;
     }
     return chars_modified;

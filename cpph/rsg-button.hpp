@@ -2,20 +2,22 @@
 #include <string>
 #include "rsg-datatypes.h"
 #include "rsg-component.hpp"
+#include "rsfonts.h"
 
 namespace rsgui {
-	enum ButtonDecoration {
+	enum ButtonBorder {
 		RSG_BUTTON_BORDER_NONE,
 		RSG_BUTTON_BORDER_SINGLE,
-		RSG_BUTTON_BORDER_DOUBLE
+		RSG_BUTTON_BORDER_DOUBLE,
+		RSG_BUTTON_BORDER_TITLE
 	};
 
 	class Button : 
 		public Component,
-		public Highlightable,
-		public Enableable
+		public Selectable,
+		public Inhibitable
 	{
-		ButtonDecoration buttonDecoration;
+		ButtonBorder buttonBorder;
 		std::string buttonText;
 	public:
 		Button(
@@ -23,8 +25,7 @@ namespace rsgui {
 			rsd::uint2 size,
 			std::string label,
 			rsd::float4 fgCol,
-			rsd::float4 bgCol,
-			bool enabled
+			rsd::float4 bgCol
 		) : 
 			buttonText(label)
 		{
@@ -32,19 +33,108 @@ namespace rsgui {
 			this->size = size;
 
 			this->fgCol = fgCol;
-			this->fgColHighlight = fgCol;
-			this->fgColDisabled = fgCol;
+			this->highlightedFgCol = fgCol;
+			this->selectedFgCol = fgCol;
+			this->inhibitedFgCol = fgCol;
 
 			this->bgCol = bgCol;
-			this->bgColHighlight = bgCol;
-			this->bgColDisabled = bgCol;
+			this->highlightedBgCol = bgCol;
+			this->selectedBgCol = bgCol;
+			this->inhibitedBgCol = bgCol;
 
-			this->enabled = enabled;
-			buttonDecoration = RSG_BUTTON_BORDER_NONE;
+			this->highlightable = true;
+			this->selectable = true;
+			this->inhibited = false;
+
+			buttonBorder = RSG_BUTTON_BORDER_NONE;
 		}
 
-		void SetText(std::string label) {
-			buttonText = label;
+		void SetBorder(ButtonBorder border) {
+			buttonBorder = border;
+		}
+
+		void SetText(std::string text) {
+			buttonText = text;
+		}
+
+		void OnHighlighted() {
+
+		}
+
+		void OnSelected() {
+
+		}
+
+		Uint32 GetBorderChar(Uint32 offset) {
+			Uint32 ret_code = ' ';
+			switch (buttonBorder) {
+			case RSG_BUTTON_BORDER_SINGLE:
+				ret_code = RSG_LINE_SINGLE + offset;
+				break;
+			case RSG_BUTTON_BORDER_DOUBLE:
+				ret_code = RSG_LINE_DOUBLE + offset;
+				break;
+			case RSG_BUTTON_BORDER_TITLE:
+				ret_code = RSG_TITLE_BORDERS + offset;
+				break;
+			}
+			return ret_code;
+		}
+
+		/* Component rendering interface methods */
+		void Repaint(RsgEngine* engine) {
+			//todo dirty chars
+			Paint(engine); //debug just paint for now
+		}
+		void Paint(RsgEngine* engine) {
+			/* Temporary character data object for blitting */
+			rsd::CharData* tmp_char = new rsd::CharData(
+				fgCol, bgCol, ' ', ' '
+			);
+
+			//todo actually draw the button
+
+			//todo also draw borders if needed
+
+			for (Uint32 iy = position.y; iy < position.y + size.y; ++iy) {
+				//draw each line of the button
+				engine->FillCharacter(
+					engine->PointToIndex(position.x, iy),
+					size.x,
+					tmp_char,
+					this
+				);
+			}
+			//insert text
+			Uint32 text_rel_start = ((size.x - buttonText.length()) / 2) 
+				+ (position.y * engine->GetDisplaySize().x);
+
+			for (Uint32 c = 0; c < buttonText.length(); ++c) {
+				tmp_char->char1 = buttonText.at(c);
+				engine->SetCharacter(
+					position.x + text_rel_start + c,
+					tmp_char,
+					this
+				);
+			}
+
+			//todo clean up
+			if (buttonBorder == RSG_BUTTON_BORDER_TITLE) {
+				//draw preceeding title break
+				tmp_char->char1 = GetBorderChar(TITLE_BREAK_RIGHT);
+				engine->SetCharacter(
+					position.x,
+					tmp_char,
+					this
+				);
+				//draw proceeding title break
+				tmp_char->char1 = GetBorderChar(TITLE_BREAK_LEFT);
+				engine->SetCharacter(
+					position.x + size.x - 1,
+					tmp_char,
+					this
+				);
+			}
 		}
 	};
 }

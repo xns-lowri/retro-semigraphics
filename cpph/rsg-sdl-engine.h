@@ -6,22 +6,26 @@
 class RsgGuiEngine;
 
 class RsgEngine {
-    //static variables
-    Uint64 last_tick; //use for framerate calc
-    Uint32 scale;                   //render scale
-    Uint32 r_width, r_height;   //640x350?
-    Uint32 w_width, w_height;   //1280x700?
+private:
+    //todo clean up vars? :/
 
-    Uint32 chars_per_line;    //number of characters per row/line of text
-    Uint32 n_lines;           //number of rows in window
-
-    Uint32 n_chars;  //total number of glyphs on screen
-
-    float framerate;
-
-    /* public variables */
+    /* Main character data for GPU */
     rsd::CharData* charData; //pointer to char1 data array
 
+    //SDL Engine resources
+    Uint32 scale;               //render scale
+    Uint32 r_width, r_height;   //'render' width = GPU output texture size
+    Uint32 w_width, w_height;   //window size = render size * scale;
+
+    Uint32 chars_per_line;  //number of characters per row/line of text
+    Uint32 n_lines;         //number of rows in window
+    Uint32 n_chars;         //total number of glyphs on screen
+
+    //other engine resources
+    Uint64 last_tick; //use for framerate calc, timestamping
+    float framerate; //fps counter variable
+
+    //GPU resources
     rsd::float2 render_extents; //window extents for vert transform
     rsd::float2 glyphsize;
     rsd::float2 glyphmapsize;
@@ -46,6 +50,10 @@ class RsgEngine {
     RsgGuiEngine* guiEngine;
 
 public:
+    /* public variables */
+    rsd::CharMetadata* charMetadata;		//character metadata array (owner, dirty)
+
+    /* Method declarations */
     RsgEngine();
 
     /* SDL mirror functions */
@@ -63,8 +71,10 @@ public:
     bool SetGuiEngine(RsgGuiEngine* engine);
 
     /* Getters and helpers */
-    //Get size of display in characters
-    rsd::uint2* GetDisplaySize();
+    //Get x,y size of display in characters
+    rsd::uint2 GetDisplaySize();
+    //Get number of characters in display
+    Uint32 GetCharacterCount();
 
     //Get chardata array index from x,y point in display 
     Uint32 PointToIndex(Uint32 x, Uint32 y);
@@ -73,12 +83,17 @@ public:
     /* Data setters */
     //character setters setters
     //set data for single char from input char data
-    bool SetCharacter(Uint32 index, rsd::CharData* data);
+    bool SetCharacter(
+        Uint32 index, 
+        rsd::CharData* data,
+        rsgui::Component* owner
+    );
 
     //fill multiple positions from input char data
     Uint32 FillCharacter(
         Uint32 index,
         Uint32 count,
-        rsd::CharData* data
+        rsd::CharData* data,
+        rsgui::Component* owner
     );
 };
