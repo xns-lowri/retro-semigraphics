@@ -13,6 +13,7 @@ RsgGuiEngine::RsgGuiEngine(RsgEngine* engine) {
 	sdlEngine->SetGuiEngine(this);
 
 	renderableComponent = NULL;
+	lastMouseOver = NULL;
 }
 
 rsgui::Window* RsgGuiEngine::InitEngineWindow(
@@ -25,7 +26,8 @@ rsgui::Window* RsgGuiEngine::InitEngineWindow(
 		sdlEngine->GetDisplaySize(),
 		windowTitle,
 		fgCol,
-		bgCol
+		bgCol,
+		this
 	);
 	SetRenderableComponent(main_window);
 	return main_window;
@@ -58,13 +60,14 @@ SDL_AppResult RsgGuiEngine::Event(SDL_Event* event) {
 				lastSelectable->SetSelected(false);
 			}
 
+			lastMouseOver = thisMouseOver;
+
 			rsgui::Selectable* thisSelectable = 
 				dynamic_cast<rsgui::Selectable*>(thisMouseOver);
 			if (thisSelectable != NULL) {
 				thisSelectable->SetHighlighted(true);
+				thisSelectable->OnHighlighted();
 			}
-
-			lastMouseOver = thisMouseOver;
 		}
 		//lastMouseOver;
 	}
@@ -86,6 +89,7 @@ SDL_AppResult RsgGuiEngine::Event(SDL_Event* event) {
 			if (lastSelectable->GetSelected()) {
 				SDL_Log("Mouse clicked event!");
 				//todo callback
+				lastSelectable->OnSelected();
 				lastSelectable->SetSelected(false);
 			}
 		}
@@ -93,6 +97,22 @@ SDL_AppResult RsgGuiEngine::Event(SDL_Event* event) {
 
 	return SDL_APP_CONTINUE;
 };
+
+void RsgGuiEngine::RequestQuit() {
+	SDL_Event quit_event{
+		.type = SDL_EVENT_QUIT
+	};
+
+	sdlEngine->PushEvent(&quit_event);
+}
+
+void RsgGuiEngine::RequestMinimise() {
+	SDL_Event minimise_event{
+		.type = SDL_EVENT
+	};
+
+	sdlEngine->PushEvent(&minimise_event);
+}
 
 void RsgGuiEngine::Quit() {
 	//todo delete all children

@@ -600,6 +600,10 @@ SDL_AppResult RsgEngine::Event(SDL_Event* event) {
     return appResult;
 }
 
+void RsgEngine::PushEvent(SDL_Event* event) {
+    SDL_PushEvent(event);
+}
+
 /* Call in SDL_Quit to close the app gracefully */
 void RsgEngine::Quit() {
     //release buffers

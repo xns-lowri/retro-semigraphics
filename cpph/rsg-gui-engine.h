@@ -29,6 +29,8 @@ public:
 
 	//sdl-like functions
 	SDL_AppResult Event(SDL_Event* event);
+	void RequestQuit();
+	void RequestMinimise();
 	void Quit();
 
 	//Render method called by sdl engine itself

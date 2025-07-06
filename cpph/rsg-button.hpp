@@ -1,10 +1,13 @@
 #pragma once
 #include <string>
+#include <functional>
 #include "rsg-datatypes.h"
 #include "rsg-component.hpp"
 #include "rsfonts.h"
 
 namespace rsgui {
+	typedef void(rsgui::MouseListener::* MouseCallback )(rsgui::Component*);
+
 	enum ButtonBorder {
 		RSG_BUTTON_BORDER_NONE,
 		RSG_BUTTON_BORDER_SINGLE,
@@ -17,8 +20,13 @@ namespace rsgui {
 		public Selectable,
 		public Inhibitable
 	{
+	private:
 		ButtonBorder buttonBorder;
 		std::string buttonText;
+		//void (*mouseClickCallback)();
+		//specifically using a pointer to member of MouseListener class???
+		MouseListener* mouseListener;
+		MouseCallback mouseClickCallback;
 	public:
 		Button(
 			rsd::uint2 position,
@@ -61,14 +69,20 @@ namespace rsgui {
 			buttonText = text;
 		}
 
+		void SetClickedCallback(MouseListener* mouseListener, MouseCallback mouseClickCallback) {
+			this->mouseListener = mouseListener;
+			this->mouseClickCallback = mouseClickCallback;
+		}
+
 		//todo?
 		/*void OnHighlighted() {
 
-		}
+		}*/
 
 		void OnSelected() {
-
-		}*/
+			if (mouseListener == NULL || mouseClickCallback == NULL) { return; }
+			(mouseListener->*mouseClickCallback)(this);
+		}
 
 		Uint32 GetBorderChar(Uint32 offset) {
 			Uint32 ret_code = ' ';

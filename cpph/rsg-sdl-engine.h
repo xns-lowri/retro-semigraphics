@@ -65,6 +65,8 @@ public:
     );
     SDL_AppResult Render();
     SDL_AppResult Event(SDL_Event* event);
+
+    void PushEvent(SDL_Event* event);
     void Quit();
     /* End SDL functions */
 

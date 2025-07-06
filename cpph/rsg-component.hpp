@@ -76,8 +76,8 @@ namespace rsgui {
 		}
 
 		/* Callback methods */
-		//virtual void OnHighlighted() {};
-		//virtual void OnSelected() {};
+		virtual void OnHighlighted() {};
+		virtual void OnSelected() {};
 	};
 
 	/* components that can be turned on or off */
@@ -99,6 +99,12 @@ namespace rsgui {
 		bool GetInhibited() {
 			return inhibited;
 		}
+	};
+
+	/* components that can service mouse events */
+	class MouseListener {
+	public:
+		virtual void MouseClicked(rsgui::Component* element) {};
 	};
 
 	/* Component List Node class */

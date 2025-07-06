@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <functional>
 #include "rsg-datatypes.h"
 #include "rsg-component.hpp"
 #include "rsg-button.hpp"
@@ -20,7 +21,11 @@ namespace rsgui {
 		RSG_WINDOW_BORDER_DOUBLE
 	};
 
-	class Window: public Component, public Container {
+	class Window: 
+		public Component, 
+		public Container,
+		public MouseListener
+	{
 		//rsd::uint2 position;
 		//rsd::uint2 size;
 		WindowType windowType;
@@ -31,6 +36,11 @@ namespace rsgui {
 		rsd::float4 titleFgCol;
 		rsd::float4 titleBgCol;
 
+		RsgGuiEngine* parent;
+
+		Button* quit_btn;
+		Button* minimise_btn;
+
 	public:
 		//todo other constructors probably
 		/* Window Constructor */
@@ -39,7 +49,8 @@ namespace rsgui {
 			rsd::uint2 size,
 			std::string title,
 			rsd::float4 fgCol,
-			rsd::float4 bgCol
+			rsd::float4 bgCol,
+			RsgGuiEngine* parent
 			//may need to add WindowType param if reusing this class for sub-windows?
 		) 
 		{
@@ -54,6 +65,8 @@ namespace rsgui {
 			this->windowBorder = RSG_WINDOW_BORDER_SINGLE;
 
 			this->children = new ComponentList();
+
+			this->parent = parent;
 		}
 
 		/* Create quit, minimise, maximise buttons for main window */
@@ -62,7 +75,7 @@ namespace rsgui {
 
 			/* Main window has quit button */
 			std::string quit_btn_text = "x";
-			Button* quit_btn = new Button(
+			quit_btn = new Button(
 				rsd::uint2( //button pos
 					(position.x + size.x) - (1 + btn_size.x),
 					position.y
@@ -84,11 +97,33 @@ namespace rsgui {
 				rsd::float4(0.8f, 0.8f, 0.8f, 1.0f)
 			);
 
+			quit_btn->SetClickedCallback(
+				this,
+				&rsgui::MouseListener::MouseClicked //omg seriously hwut
+			);
+
+			/*quit_btn->SetClickedCallback(
+				this,
+				static_cast<rsgui::MouseCallback>(MouseClicked);
+			);
+			
+			void(*callback)(Window*) = [](Window* thi) {
+				thi->QuitButtonClicked();
+			};
+			quit_btn->SetClickedCallback(
+				callback(this)
+			);*/
+
+			//std::function<void(void)> stdf_callback = &QuitButtonClicked;
+			//quit_btn->SetClickedCallback(stdf_callback);
+
+			//nearly there i swear
+
 			children->AddComponent(quit_btn);
 
 			/* Main window has minimise button */
 			std::string minimise_btn_text = "_";
-			Button* minimise_btn = new Button(
+			minimise_btn = new Button(
 				rsd::uint2( //button pos
 					(position.x + size.x) - (1 + (2 * btn_size.x)),
 					position.y
@@ -109,6 +144,13 @@ namespace rsgui {
 			minimise_btn->SetSelectedBackgroundColour(
 				rsd::float4(0.8f, 0.8f, 0.8f, 1.0f)
 			);
+
+			//plsplspls
+			minimise_btn->SetClickedCallback(
+				this,
+				&rsgui::MouseListener::MouseClicked 
+			);
+
 			children->AddComponent(minimise_btn);
 
 			//Todo maximise/restore? Deal with resizing l8r D=
@@ -169,6 +211,25 @@ namespace rsgui {
 				return RSG_TITLE_BORDERS + TITLE_FULL;
 				break;
 			}
+		}
+
+		void MouseClicked(rsgui::Component* element) {
+			SDL_Log("Nearly a working event system?");
+			//SDL_Log("this: %i", this);
+			if (element == quit_btn) {
+				parent->RequestQuit();
+			}
+			if (element == minimise_btn) {
+				parent->RequestMinimise();
+			}
+		}
+
+		void MinimiseButtonClicked() {
+
+		}
+
+		void QuitButtonClicked() {
+			SDL_Log("Will this work?");
 		}
 
 		/* Paint methods */
