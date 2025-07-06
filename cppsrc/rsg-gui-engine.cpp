@@ -108,7 +108,7 @@ void RsgGuiEngine::RequestQuit() {
 
 void RsgGuiEngine::RequestMinimise() {
 	SDL_Event minimise_event{
-		.type = SDL_EVENT
+		.type = SDL_EVENT_WINDOW_MINIMIZED //doesn't work lol
 	};
 
 	sdlEngine->PushEvent(&minimise_event);
