@@ -102,4 +102,7 @@ public:
         rsd::CharData* data,
         rsgui::Component* owner
     );
+
+    void CloseWindow();
+    void MinimiseWindow();
 };

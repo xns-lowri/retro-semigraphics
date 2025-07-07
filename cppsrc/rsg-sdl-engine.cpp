@@ -700,3 +700,18 @@ Uint32 RsgEngine::FillCharacter(
     }
     return chars_modified;
 }
+
+/* Closes the current window */
+void RsgEngine::CloseWindow() {
+    SDL_Event quit_event{
+        .type = SDL_EVENT_QUIT
+    };
+
+    PushEvent(&quit_event);
+    //this (in)advertently closes the app
+    //needs refactoring to support multiple SDL windows in app
+}
+/* Minimises the current window */
+void RsgEngine::MinimiseWindow() {
+    SDL_MinimizeWindow(window);
+}

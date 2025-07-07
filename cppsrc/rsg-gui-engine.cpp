@@ -98,20 +98,26 @@ SDL_AppResult RsgGuiEngine::Event(SDL_Event* event) {
 	return SDL_APP_CONTINUE;
 };
 
-void RsgGuiEngine::RequestQuit() {
-	SDL_Event quit_event{
+void RsgGuiEngine::RequestClose() {
+	/*SDL_Event quit_event{
 		.type = SDL_EVENT_QUIT
 	};
 
-	sdlEngine->PushEvent(&quit_event);
+	sdlEngine->PushEvent(&quit_event);*/
+
+	sdlEngine->CloseWindow();
+
 }
 
 void RsgGuiEngine::RequestMinimise() {
-	SDL_Event minimise_event{
+	/*SDL_Event minimise_event{
 		.type = SDL_EVENT_WINDOW_MINIMIZED //doesn't work lol
 	};
 
-	sdlEngine->PushEvent(&minimise_event);
+	sdlEngine->PushEvent(&minimise_event);*/
+
+	sdlEngine->MinimiseWindow();
+	//feels a bit cheaty but i guess it fits abstraction/SoC
 }
 
 void RsgGuiEngine::Quit() {

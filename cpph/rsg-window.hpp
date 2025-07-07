@@ -217,7 +217,7 @@ namespace rsgui {
 			SDL_Log("Nearly a working event system?");
 			//SDL_Log("this: %i", this);
 			if (element == quit_btn) {
-				parent->RequestQuit();
+				parent->RequestClose();
 			}
 			if (element == minimise_btn) {
 				parent->RequestMinimise();

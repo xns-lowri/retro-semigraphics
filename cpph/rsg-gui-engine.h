@@ -29,7 +29,7 @@ public:
 
 	//sdl-like functions
 	SDL_AppResult Event(SDL_Event* event);
-	void RequestQuit();
+	void RequestClose();
 	void RequestMinimise();
 	void Quit();
 
