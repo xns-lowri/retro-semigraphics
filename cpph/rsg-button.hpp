@@ -6,7 +6,7 @@
 #include "rsfonts.h"
 
 namespace rsgui {
-	typedef void(rsgui::MouseListener::* MouseCallback )(rsgui::Component*);
+	typedef void(rsgui::MouseListener::* MouseCallback )(SDL_Event* event, rsgui::Component*);
 
 	enum ButtonBorder {
 		RSG_BUTTON_BORDER_NONE,
@@ -75,13 +75,13 @@ namespace rsgui {
 		}
 
 		//todo?
-		/*void OnHighlighted() {
+		/*void OnHighlighted(SDL_Event* event) {
 
 		}*/
 
-		void OnSelected() {
+		void OnSelected(SDL_Event* event) {
 			if (mouseListener == NULL || mouseClickCallback == NULL) { return; }
-			(mouseListener->*mouseClickCallback)(this);
+			(mouseListener->*mouseClickCallback)(event, this); //invoke callback
 		}
 
 		Uint32 GetBorderChar(Uint32 offset) {

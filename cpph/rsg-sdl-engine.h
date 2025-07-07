@@ -77,6 +77,8 @@ public:
     rsd::uint2 GetDisplaySize();
     //Get number of characters in display
     Uint32 GetCharacterCount();
+    //Get SDL window position on screen (px)
+    rsd::int2 GetWindowPosition();
 
     //Get chardata array index from char x,y points in display 
     Uint32 PointToIndex(Uint32 x, Uint32 y);
@@ -105,4 +107,7 @@ public:
 
     void CloseWindow();
     void MinimiseWindow();
+    void MoveWindow(rsd::float2 relmove);
+
+    void TrapMouse(bool trapped);
 };

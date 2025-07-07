@@ -31,6 +31,12 @@ public:
 	SDL_AppResult Event(SDL_Event* event);
 	void RequestClose();
 	void RequestMinimise();
+	void RequestMoveWindow(rsd::float2 relmove);
+
+	void RequestTrapMouse(bool trapped);
+
+	rsd::int2 GetParentWindowPosition();
+
 	void Quit();
 
 	//Render method called by sdl engine itself

@@ -76,8 +76,11 @@ namespace rsgui {
 		}
 
 		/* Callback methods */
-		virtual void OnHighlighted() {};
-		virtual void OnSelected() {};
+		virtual void OnHighlighted(SDL_Event* event) {};
+		virtual void OnSelected(SDL_Event* event) {};
+		virtual void OnMouseDown(SDL_Event* event) {};
+		virtual void OnMouseUp(SDL_Event* event) {};
+		virtual void OnDragged(SDL_Event* event) {};
 	};
 
 	/* components that can be turned on or off */
@@ -104,7 +107,14 @@ namespace rsgui {
 	/* components that can service mouse events */
 	class MouseListener {
 	public:
-		virtual void MouseClicked(rsgui::Component* element) {};
+		virtual void MouseClicked(
+			SDL_Event* event,
+			rsgui::Component* element
+		) {};
+		virtual void MouseDragged(
+			SDL_Event* event, 
+			rsgui::Component* element
+		) {};
 	};
 
 	/* Component List Node class */

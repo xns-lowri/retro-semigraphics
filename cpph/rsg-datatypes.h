@@ -52,6 +52,14 @@ namespace rsd {
         bool operator>(const uint2& a) {
             return (x > a.x) || (y > a.y);
         }
+        bool operator<(const uint2& a) {
+            return (x < a.x) || (y < a.y);
+        }
+    };
+
+    struct int2 {
+        int x, y;
+        int2(int w = 0, int h = 0) : x(w), y(h) {}
     };
 
     //character data class, layout for vert shader
