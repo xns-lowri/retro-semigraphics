@@ -651,12 +651,21 @@ Uint32 RsgEngine::GetCharacterCount() {
     return n_chars;
 }
 
+rsd::int2 RsgEngine::GetWindowPosition() {
+    int x, y = 0;
+    SDL_GetWindowPosition(window, &x, &y);
+    return rsd::int2(x, y);
+}
+
 //Get character linear buffer index from x,y points
 Uint32 RsgEngine::PointToIndex(Uint32 x, Uint32 y) {
     return (y * GetDisplaySize().x) + x;
 }
 //Get character linear buffer index from x,y uint2
 Uint32 RsgEngine::PointToIndex(rsd::uint2 point) {
+    if (point < rsd::uint2(0, 0) || point > rsd::uint2(chars_per_line, n_lines)) {
+        return UINT32_MAX;
+    }
     return (point.y * GetDisplaySize().x) + point.x;
 }
 
@@ -699,4 +708,37 @@ Uint32 RsgEngine::FillCharacter(
         ++chars_modified;
     }
     return chars_modified;
+}
+
+/* Closes the current window */
+void RsgEngine::CloseWindow() {
+    SDL_Event quit_event{
+        .type = SDL_EVENT_QUIT
+    };
+
+    PushEvent(&quit_event);
+    //this (in)advertently closes the app
+    //needs refactoring to support multiple SDL windows in app
+}
+/* Minimises the current window */
+void RsgEngine::MinimiseWindow() {
+    SDL_MinimizeWindow(window);
+}
+
+void RsgEngine::MoveWindow(rsd::float2 relmove) {
+    int x, y = 0;
+
+    if ( !SDL_GetWindowPosition(window, &x, &y) ) {
+        return;
+    }
+
+    SDL_SetWindowPosition(
+        window,
+        x + static_cast<int>(std::round(relmove.x)),
+        y + static_cast<int>(std::round(relmove.y))
+    );
+}
+
+void RsgEngine::TrapMouse(bool trapped) {
+    SDL_SetWindowRelativeMouseMode(window, trapped);
 }

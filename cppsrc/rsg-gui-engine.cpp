@@ -36,39 +36,70 @@ rsgui::Window* RsgGuiEngine::InitEngineWindow(
 /* Gui engine event handler - called by sdl event handler */
 SDL_AppResult RsgGuiEngine::Event(SDL_Event* event) {
 	//SDL_Log("Graphics event!");
-	
 	//todo handle various events
+
+	//todo this one's getting hefty - move to new class?
+
 	if (event->type == SDL_EVENT_MOUSE_MOTION) {
+		/* Get char under current mouse position */
 		SDL_MouseMotionEvent mouse_event = event->motion;
 		rsd::uint2 mouse_charpos =
 			sdlEngine->ScreenPointToCharXY(
 				rsd::float2(mouse_event.x, mouse_event.y)
 			);
 		Uint32 mouse_charindex = sdlEngine->PointToIndex(mouse_charpos);
-
 		//SDL_Log("Mouse is at char x:%i, y:%i", mouse_charpos.x, mouse_charpos.y);
 
-		rsgui::Component* thisMouseOver = 
-			sdlEngine->charMetadata[mouse_charindex].charOwner;
+		/* Get component at char under mouse */
+		rsgui::Component* thisMouseOver = NULL;
+		if (mouse_charindex < sdlEngine->GetCharacterCount()) {
+			//mouse left window
+			thisMouseOver = sdlEngine->charMetadata[mouse_charindex].charOwner;
+		}
+			
 
+		/* Check if element under mouse has changed */
 		if (lastMouseOver != thisMouseOver) {
 			//SDL_Log("Moused over new element?");
 			rsgui::Selectable* lastSelectable =
 				dynamic_cast<rsgui::Selectable*>(lastMouseOver);
+			//Clear mouse state if mouse has left last selectable element
 			if (lastSelectable != NULL) {
+				//Clear highlight and selected colour style
 				lastSelectable->SetHighlighted(false);
 				lastSelectable->SetSelected(false);
 			}
 
-			lastMouseOver = thisMouseOver;
+			//Last selectable element is now the new element
+			if (thisMouseOver != NULL) {
+				lastMouseOver = thisMouseOver;
+			}
 
 			rsgui::Selectable* thisSelectable = 
 				dynamic_cast<rsgui::Selectable*>(thisMouseOver);
+			//Set mouse state for new element
+			//ignores mouse button already down
 			if (thisSelectable != NULL) {
-				thisSelectable->SetHighlighted(true);
-				thisSelectable->OnHighlighted();
+				//Set using highlighted colour style
+				thisSelectable->SetHighlighted(true); 
+				//Callback: Mouse entered element
+				thisSelectable->OnHighlighted(event);
 			}
 		}
+
+		//mouse movement event if already selected
+		rsgui::Selectable* thisSelectable =
+			dynamic_cast<rsgui::Selectable*>(lastMouseOver);
+		bool isSelected = false;
+		//Set mouse state for new element
+		//ignores mouse button already down
+		if (thisSelectable != NULL) {
+			isSelected = thisSelectable->GetSelected();
+			if (isSelected) {
+				thisSelectable->OnDragged(event);
+			}
+		}
+		
 		//lastMouseOver;
 	}
 
@@ -78,7 +109,9 @@ SDL_AppResult RsgGuiEngine::Event(SDL_Event* event) {
 			dynamic_cast<rsgui::Selectable*>(lastMouseOver);
 		if (lastSelectable != NULL) {
 			lastSelectable->SetSelected(true);
+			lastSelectable->OnMouseDown(event);
 		}
+		//todo left/right/middle click?
 	}
 
 	if (event->type == SDL_EVENT_MOUSE_BUTTON_UP) {
@@ -86,32 +119,58 @@ SDL_AppResult RsgGuiEngine::Event(SDL_Event* event) {
 		rsgui::Selectable* lastSelectable =
 			dynamic_cast<rsgui::Selectable*>(lastMouseOver);
 		if (lastSelectable != NULL) {
+			//mouse up event
+			lastSelectable->OnMouseUp(event);
+
+			//Accept full button 'click' cycle
 			if (lastSelectable->GetSelected()) {
-				SDL_Log("Mouse clicked event!");
-				//todo callback
-				lastSelectable->OnSelected();
+				//SDL_Log("Mouse clicked event!");
+				//Callback: mouse button clicked (todo left/primary)
+				lastSelectable->OnSelected(event);
+				//Clear selected colour style
 				lastSelectable->SetSelected(false);
 			}
 		}
+		//todo left/right/middle click?
 	}
+
+	//todo pass event to event listeners
 
 	return SDL_APP_CONTINUE;
 };
 
-void RsgGuiEngine::RequestQuit() {
-	SDL_Event quit_event{
+void RsgGuiEngine::RequestClose() {
+	/*SDL_Event quit_event{
 		.type = SDL_EVENT_QUIT
 	};
 
-	sdlEngine->PushEvent(&quit_event);
+	sdlEngine->PushEvent(&quit_event);*/
+
+	sdlEngine->CloseWindow();
+
 }
 
 void RsgGuiEngine::RequestMinimise() {
-	SDL_Event minimise_event{
+	/*SDL_Event minimise_event{
 		.type = SDL_EVENT_WINDOW_MINIMIZED //doesn't work lol
 	};
 
-	sdlEngine->PushEvent(&minimise_event);
+	sdlEngine->PushEvent(&minimise_event);*/
+
+	sdlEngine->MinimiseWindow();
+	//feels a bit cheaty but i guess it fits abstraction/SoC
+}
+
+void RsgGuiEngine::RequestMoveWindow(rsd::float2 relmove) {
+	sdlEngine->MoveWindow(relmove);
+}
+
+void RsgGuiEngine::RequestTrapMouse(bool trapped) {
+	sdlEngine->TrapMouse(trapped);
+}
+
+rsd::int2 RsgGuiEngine::GetParentWindowPosition() {
+	return sdlEngine->GetWindowPosition();
 }
 
 void RsgGuiEngine::Quit() {

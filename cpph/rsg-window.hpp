@@ -24,6 +24,7 @@ namespace rsgui {
 	class Window: 
 		public Component, 
 		public Container,
+		public Selectable,
 		public MouseListener
 	{
 		//rsd::uint2 position;
@@ -40,6 +41,8 @@ namespace rsgui {
 
 		Button* quit_btn;
 		Button* minimise_btn;
+
+		rsd::float2 windowDragOrigin;
 
 	public:
 		//todo other constructors probably
@@ -65,6 +68,11 @@ namespace rsgui {
 			this->windowBorder = RSG_WINDOW_BORDER_SINGLE;
 
 			this->children = new ComponentList();
+
+			this->quit_btn = NULL;
+			this->minimise_btn = NULL;
+
+			this->windowDragOrigin = rsd::float2(0, 0);
 
 			this->parent = parent;
 		}
@@ -213,23 +221,57 @@ namespace rsgui {
 			}
 		}
 
-		void MouseClicked(rsgui::Component* element) {
-			SDL_Log("Nearly a working event system?");
+		//inherited from MouseListener
+		void MouseClicked(
+			SDL_Event* event, 
+			rsgui::Component* element
+		) {
+			//SDL_Log("Nearly a working event system?");
 			//SDL_Log("this: %i", this);
 			if (element == quit_btn) {
-				parent->RequestQuit();
+				parent->RequestClose();
 			}
 			if (element == minimise_btn) {
 				parent->RequestMinimise();
 			}
 		}
 
-		void MinimiseButtonClicked() {
+		//inherited from MouseListener
+		void MouseDragged(
+			SDL_Event* event, 
+			rsgui::Component* element
+		) {
 
+			//SDL_Log("Mouse dragged!");
+			parent->RequestMoveWindow(
+				rsd::float2(
+					event->motion.xrel,// - windowDragOrigin.x,
+					event->motion.yrel // - windowDragOrigin.y
+				)
+			);
 		}
 
-		void QuitButtonClicked() {
-			SDL_Log("Will this work?");
+		//inherited from Selectable
+		void OnDragged(SDL_Event* event) {
+			MouseDragged(event, this);
+		}
+		
+		void OnMouseDown(SDL_Event* event) {
+			//todo only if mouse is over title bar
+
+			//ugh this is a rabbit hole in itself
+			//whoever knew a gui engine would be so hard??
+			parent->RequestTrapMouse(true);
+
+			windowDragOrigin = rsd::float2(
+				event->motion.x,
+				event->motion.y
+			);
+			SDL_Log("Set drag origin");
+			//todo
+		}
+		void OnMouseUp(SDL_Event* event) {
+			parent->RequestTrapMouse(false);
 		}
 
 		/* Paint methods */
@@ -246,6 +288,9 @@ namespace rsgui {
 			//todo better method for drawing various box components?
 			//probably going to be a lot of duplicated code, hopefully
 			//the solution becomes clear soon D:
+
+			//todo need to be able to individually/randomly
+			//draw certain (dirty) pixels
 
 			//draw title row
 			tmp_char->char1 = RSG_TITLE_BORDERS + TITLE_FULL;
