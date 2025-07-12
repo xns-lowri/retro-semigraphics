@@ -87,7 +87,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
         rsd::float4(0.1f, 0.1f, 0.1f, 1.0f)
     );
 
-    main_window->CreateMainWindowControls();
+    main_window->CreateMainWindowControls(); //add comment
 
 
     /*rsgui::Window* main_window = new rsgui::Window(

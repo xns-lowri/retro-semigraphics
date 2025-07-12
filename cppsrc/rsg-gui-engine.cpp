@@ -7,6 +7,8 @@
 #include "../cpph/rsg-window.hpp"
 #include "../cpph/rsfonts.h"
 
+//comment
+
 /* RsgGuiEngine Class constructor */
 RsgGuiEngine::RsgGuiEngine(RsgEngine* engine) {
 	sdlEngine = engine;
