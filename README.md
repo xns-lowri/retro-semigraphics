@@ -13,6 +13,9 @@ My goals for this project revolve around learning C++ and shader coding, learnin
 
 Retro-semigraphics is at its core a 'terminal emulator', not in the normal sense, but in the sense that applications are built upon and rendered entirely out of fixed-size font glyphs in fixed positions on the screen, emulating the 'text-mode' graphics of early IBM-compatible PCs on contemporary desktop environments. Essentially, the worst of both worlds!
 
+![Screenshot of empty grey window rendered with line border and minimise and close buttons](img/earlydev-1.PNG "Early development screenshot")
+It's not much yet, but it's a start!
+
 ## What it does
 
 Retro-semigraphics is built as a collection of a few distinct subsystems:
